@@ -1,0 +1,44 @@
+import matplotlib.pyplot as plt
+
+arquitecturas = {
+    "Edge": {"nodos": 100, "costo_nodo": 300,  "cpu_max": 40},
+    "Fog":  {"nodos": 20,  "costo_nodo": 1500, "cpu_max": 70},
+    "MEC":  {"nodos": 5,   "costo_nodo": 8000, "cpu_max": 100},
+}
+
+paquetes = {
+    "Básico": {"costo": 20,  "cpu": 10, "seguridad": 40},
+    "Medio":  {"costo": 80,  "cpu": 30, "seguridad": 70},
+    "Alto":   {"costo": 200, "cpu": 60, "seguridad": 95},
+}
+
+resultados = []
+for arq, a in arquitecturas.items():
+    for paq, p in paquetes.items():
+        costo_total = a["nodos"] * (a["costo_nodo"] + p["costo"])
+        viable = p["cpu"] <= a["cpu_max"]   
+        resultados.append((arq, paq, costo_total, p["seguridad"], viable))
+
+colores = {"Edge": "tab:blue", "Fog": "tab:orange", "MEC": "tab:green"}
+plt.figure(figsize=(8, 5))
+for arq, paq, costo, seg, viable in resultados:
+    marcador = "o" if viable else "x"
+    plt.scatter(costo, seg, color=colores[arq], marker=marcador, s=100)
+    plt.annotate(paq, (costo, seg), textcoords="offset points", xytext=(6, 6), fontsize=8)
+
+for arq, c in colores.items():
+    plt.scatter([], [], color=c, label=arq)
+plt.scatter([], [], color="gray", marker="x", label="No viable (CPU insuficiente)")
+plt.xscale("log")
+plt.xlabel("Costo total de infraestructura (USD, escala log)")
+plt.ylabel("Nivel de seguridad (0-100)")
+plt.title("Costo vs. seguridad en arquitecturas Edge, Fog y MEC")
+plt.legend()
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.savefig("costo_vs_seguridad.png", dpi=150)
+plt.show()
+
+
+for r in resultados:
+    print(r)
